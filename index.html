@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zoom Digital Signage</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-border: rgba(255,255,255,0.10);
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --accent: #38bdf8;
+      --shadow: 0 12px 40px rgba(0,0,0,0.35);
+      --ticker-height: 44px;
+      --gap: 10px;
+      --pad: 10px;
+      --radius: 14px;
+      --headline-speed: 40s;
+      --info-speed: 30s;
+      --font: Arial, Helvetica, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font);
+      background: radial-gradient(circle at top left, #1e293b, var(--bg));
+      color: var(--text);
+    }
+    body {
+      display: grid;
+      grid-template-rows: 1fr var(--ticker-height);
+      gap: var(--gap);
+      padding: var(--pad);
+    }
+    .grid {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: var(--gap);
+    }
+    .pane {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      background: rgba(17,24,39,0.92);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .pane-header {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      z-index: 5;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(2,6,23,0.68);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #e2e8f0;
+    }
+    .fill { width: 100%; height: 100%; }
+    .image-stage {
+      position: absolute;
+      inset: 0;
+      background: #020617;
+    }
+    .image-stage img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out;
+    }
+    .image-stage img.active { opacity: 1; }
+    .info-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: grayscale(15%) brightness(0.45);
+      transform: scale(1.02);
+    }
+    .info-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(2,6,23,0.35), rgba(2,6,23,0.78));
+    }
+    .info-wrap {
+      position: absolute;
+      inset: 0;
+      padding: 58px 24px 24px 24px;
+      overflow: hidden;
+    }
+    .info-scroller {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      width: calc(100% - 48px);
+      animation: scrollInfo var(--info-speed) linear infinite;
+    }
+    .info-card {
+      background: rgba(15,23,42,0.72);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .info-card h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.35rem;
+      line-height: 1.2;
+      color: white;
+    }
+    .info-card p {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+    @keyframes scrollInfo {
+      0% { transform: translateY(100%); }
+      100% { transform: translateY(-110%); }
+    }
+    .news-wrap {
+      position: absolute;
+      inset: 0;
+      padding: 58px 20px 20px 20px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98));
+    }
+    .news-feed-title {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .news-track {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: scrollHeadlines var(--headline-speed) linear infinite;
+    }
+    .headline {
+      display: block;
+      color: white;
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(30,41,59,0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      line-height: 1.35;
+      font-size: 1rem;
+    }
+    .headline small {
+      display: block;
+      margin-top: 6px;
+      color: #94a3b8;
+      font-size: 0.82rem;
+    }
+    @keyframes scrollHeadlines {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-50%); }
+    }
+    .market-pane {
+      padding: 58px 16px 16px 16px;
+      background: linear-gradient(180deg, rgba(2,6,23,0.96), rgba(15,23,42,0.96));
+    }
+    .market-note {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      top: 58px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+      z-index: 0;
+    }
+    .market-widget-host {
+      position: absolute;
+      inset: 96px 16px 16px 16px;
+      z-index: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(15,23,42,0.65);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .bottom-ticker {
+      min-height: var(--ticker-height);
+      background: rgba(2,6,23,0.96);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .status {
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      z-index: 4;
+      font-size: 12px;
+      color: #94a3b8;
+      background: rgba(2,6,23,0.7);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <div class="grid">
+    <section class="pane">
+      <div class="pane-header">Pane 1 · Image rotation</div>
+      <div class="image-stage" id="imageStage"></div>
+      <div class="status" id="imageStatus">Loading images...</div>
+    </section>
+
+    <section class="pane">
+      <div class="pane-header">Pane 2 · Scrolling infographic</div>
+      <div class="info-bg" id="infoBg"></div>
+      <div class="info-overlay"></div>
+      <div class="info-wrap">
+        <div class="info-scroller" id="infoScroller"></div>
+      </div>
+    </section>
+
+    <section class="pane">
+      <div class="pane-header">Pane 3 · RSS headlines</div>
+      <div class="news-wrap">
+        <div class="news-feed-title" id="newsFeedTitle">Latest headlines</div>
+        <div class="news-track" id="newsTrack"></div>
+      </div>
+    </section>
+
+    <section class="pane market-pane">
+      <div class="pane-header">Pane 4 · Market snapshot</div>
+      <div class="market-note">
+        Live market data from TradingView. Edit the TICKER_SYMBOLS list near the top of the file to change the stocks or funds shown.
+      </div>
+      <div class="market-widget-host">
+        <div class="tradingview-widget-container fill">
+          <div class="tradingview-widget-container__widget fill"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="bottom-ticker">
+    <div class="tradingview-widget-container fill">
+      <div class="tradingview-widget-container__widget fill"></div>
+    </div>
+  </div>
+
+  <script>
+    const IMAGE_MANIFEST_URL = './digital-signage/assets/pane1/images.json';
+    const IMAGE_ROTATION_MS = 8000;
+
+    const INFO_BACKGROUND_IMAGE = './digital-signage/assets/backgrounds/info-bg.svg';
+    const INFO_ITEMS = [
+      { title: 'Welcome', text: 'Use this pane for campus messages, event reminders, or department updates.' },
+      { title: 'Need Help?', text: 'Technology Services can place support details, room instructions, or meeting guidance here.' },
+      { title: 'Easy to Update', text: 'Edit the text list in index.html and publish again. No layout changes needed.' },
+      { title: 'Custom Background', text: 'Replace the background image file with your own muted graphic any time.' }
+    ];
+
+    const RSS_FEED_URL = 'https://feeds.npr.org/1001/rss.xml';
+    const RSS_TO_JSON_ENDPOINT = 'https://api.rss2json.com/v1/api.json?rss_url=';
+    const MAX_HEADLINES = 12;
+
+    const TICKER_SYMBOLS = [
+      { proName: 'NASDAQ:AAPL', title: 'Apple' },
+      { proName: 'NASDAQ:MSFT', title: 'Microsoft' },
+      { proName: 'NASDAQ:NVDA', title: 'NVIDIA' },
+      { proName: 'NASDAQ:GOOGL', title: 'Alphabet' },
+      { proName: 'AMEX:SPY', title: 'S&P 500 ETF' },
+      { proName: 'NASDAQ:QQQ', title: 'Nasdaq 100 ETF' }
+    ];
+
+    function formatDate(dateString) {
+      if (!dateString) return '';
+      const d = new Date(dateString);
+      if (isNaN(d)) return '';
+      return d.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    }
+
+    async function loadImagePane() {
+      const stage = document.getElementById('imageStage');
+      const status = document.getElementById('imageStatus');
+      try {
+        const response = await fetch(IMAGE_MANIFEST_URL, { cache: 'no-store' });
+        if (!response.ok) throw new Error('Image manifest could not be loaded.');
+        const images = await response.json();
+        if (!Array.isArray(images) || !images.length) throw new Error('No images found in manifest.');
+        images.forEach((src, index) => {
+          const img = document.createElement('img');
+          img.src = src;
+          img.alt = 'Digital signage image ' + (index + 1);
+          if (index === 0) img.classList.add('active');
+          stage.appendChild(img);
+        });
+        let current = 0;
+        const imgEls = stage.querySelectorAll('img');
+        status.textContent = images.length + ' image' + (images.length === 1 ? '' : 's') + ' loaded';
+        setInterval(() => {
+          imgEls[current].classList.remove('active');
+          current = (current + 1) % imgEls.length;
+          imgEls[current].classList.add('active');
+        }, IMAGE_ROTATION_MS);
+      } catch (error) {
+        status.textContent = 'Image pane setup needed';
+        stage.innerHTML = '<div style="display:flex;height:100%;align-items:center;justify-content:center;padding:30px;text-align:center;color:#cbd5e1;">Add images and update images.json, then publish again.</div>';
+        console.error(error);
+      }
+    }
+
+    function loadInfoPane() {
+      const bg = document.getElementById('infoBg');
+      const scroller = document.getElementById('infoScroller');
+      bg.style.backgroundImage = `url(${INFO_BACKGROUND_IMAGE})`;
+      const cards = [...INFO_ITEMS, ...INFO_ITEMS];
+      scroller.innerHTML = cards.map(item => `
+        <div class="info-card">
+          <h3>${item.title}</h3>
+          <p>${item.text}</p>
+        </div>
+      `).join('');
+    }
+
+    async function loadNewsPane() {
+      const title = document.getElementById('newsFeedTitle');
+      const track = document.getElementById('newsTrack');
+      try {
+        const url = RSS_TO_JSON_ENDPOINT + encodeURIComponent(RSS_FEED_URL);
+        const response = await fetch(url, { cache: 'no-store' });
+        const data = await response.json();
+        if (data.status !== 'ok' || !data.items) throw new Error('RSS feed did not return usable data.');
+        title.textContent = data.feed?.title || 'Latest headlines';
+        const items = data.items.slice(0, MAX_HEADLINES);
+        const doubled = [...items, ...items];
+        track.innerHTML = doubled.map(item => `
+          <a class="headline" href="${item.link}" target="_blank" rel="noopener noreferrer">
+            ${item.title}
+            <small>${formatDate(item.pubDate)}</small>
+          </a>
+        `).join('');
+      } catch (error) {
+        title.textContent = 'RSS setup needed';
+        track.innerHTML = '<div class="headline" style="pointer-events:none;">Set a working RSS feed URL near the top of index.html.<small>This page uses rss2json to display headlines.</small></div>';
+        console.error(error);
+      }
+    }
+
+    function injectTradingViewWidget(container, symbols, transparent) {
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+      script.async = true;
+      script.innerHTML = JSON.stringify({
+        symbols: symbols.map(s => ({ description: s.title, proName: s.proName })),
+        showSymbolLogo: true,
+        isTransparent: transparent,
+        displayMode: 'compact',
+        colorTheme: 'dark',
+        locale: 'en'
+      });
+      container.appendChild(script);
+    }
+
+    function loadTickerWidgets() {
+      const containers = document.querySelectorAll('.tradingview-widget-container__widget');
+      if (containers.length >= 2) {
+        injectTradingViewWidget(containers[0], TICKER_SYMBOLS, true);
+        injectTradingViewWidget(containers[1], TICKER_SYMBOLS, true);
+      }
+    }
+
+    loadImagePane();
+    loadInfoPane();
+    loadNewsPane();
+    loadTickerWidgets();
+  </script>
+</body>
+</html>
