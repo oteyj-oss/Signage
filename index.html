@@ -3,17 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zoom Digital Signage</title>
+  <title>Catholic University Zoom Digital Signage</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --panel-border: rgba(255,255,255,0.10);
-      --text: #f8fafc;
-      --muted: #cbd5e1;
-      --accent: #38bdf8;
-      --shadow: 0 12px 40px rgba(0,0,0,0.35);
-      --ticker-height: 44px;
+      --cua-red: #990000;
+      --cua-red-dark: #770000;
+      --cua-blue: #004c70;
+      --cua-blue-light: #005e8c;
+      --cua-gray-dark: #2f292b;
+      --cua-gray: #433b3d;
+      --cua-gray-light: #a0a0a0;
+      --bg: #1a1415;
+      --panel: #231d1f;
+      --panel-border: rgba(0, 94, 140, 0.35);
+      --text: #f8f7f4;
+      --muted: #d6d0d1;
+      --accent: #005e8c;
+      --shadow: 0 14px 38px rgba(0,0,0,0.34);
+      --ticker-height: 46px;
       --gap: 10px;
       --pad: 10px;
       --radius: 14px;
@@ -29,7 +36,7 @@
       height: 100%;
       overflow: hidden;
       font-family: var(--font);
-      background: radial-gradient(circle at top left, #1e293b, var(--bg));
+      background: radial-gradient(circle at top left, rgba(0,94,140,0.34), rgba(153,0,0,0.22) 42%, var(--bg) 72%);
       color: var(--text);
     }
     body {
@@ -49,7 +56,7 @@
       position: relative;
       min-width: 0;
       min-height: 0;
-      background: rgba(17,24,39,0.92);
+      background: linear-gradient(180deg, rgba(47,41,43,0.96), rgba(26,20,21,0.98));
       border: 1px solid var(--panel-border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
@@ -62,17 +69,18 @@
       z-index: 5;
       padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(2,6,23,0.68);
+      background: linear-gradient(90deg, rgba(153,0,0,0.92), rgba(119,0,0,0.92));
+      border: 1px solid rgba(255,255,255,0.12);
       font-size: 12px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #e2e8f0;
+      color: #fff7f7;
     }
     .fill { width: 100%; height: 100%; }
     .image-stage {
       position: absolute;
       inset: 0;
-      background: #020617;
+      background: linear-gradient(135deg, #2f292b, #1a1415);
     }
     .image-stage img {
       position: absolute;
@@ -95,7 +103,7 @@
     .info-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, rgba(2,6,23,0.35), rgba(2,6,23,0.78));
+      background: linear-gradient(to bottom, rgba(0,76,112,0.22), rgba(153,0,0,0.28), rgba(26,20,21,0.82));
     }
     .info-wrap {
       position: absolute;
@@ -112,8 +120,11 @@
       animation: scrollInfo var(--info-speed) linear infinite;
     }
     .info-card {
-      background: rgba(15,23,42,0.72);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.08);
+      border-left: 4px solid var(--cua-red);
+      border-top: 1px solid rgba(255,255,255,0.09);
+      border-right: 1px solid rgba(255,255,255,0.09);
+      border-bottom: 1px solid rgba(255,255,255,0.09);
       border-radius: 12px;
       padding: 18px;
     }
@@ -138,12 +149,12 @@
       inset: 0;
       padding: 58px 20px 20px 20px;
       overflow: hidden;
-      background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98));
+      background: linear-gradient(180deg, rgba(0,76,112,0.18), rgba(47,41,43,0.97) 16%, rgba(26,20,21,0.99));
     }
     .news-feed-title {
       font-size: 1rem;
       font-weight: bold;
-      color: var(--accent);
+      color: #6fc5ee;
       margin-bottom: 14px;
     }
     .news-track {
@@ -158,8 +169,11 @@
       text-decoration: none;
       padding: 12px 14px;
       border-radius: 10px;
-      background: rgba(30,41,59,0.7);
-      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.07);
+      border-left: 4px solid var(--cua-blue);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
       line-height: 1.35;
       font-size: 1rem;
     }
@@ -175,7 +189,7 @@
     }
     .market-pane {
       padding: 58px 16px 16px 16px;
-      background: linear-gradient(180deg, rgba(2,6,23,0.96), rgba(15,23,42,0.96));
+      background: linear-gradient(180deg, rgba(0,76,112,0.2), rgba(26,20,21,0.98));
     }
     .market-note {
       position: absolute;
@@ -193,13 +207,13 @@
       z-index: 1;
       border-radius: 12px;
       overflow: hidden;
-      background: rgba(15,23,42,0.65);
-      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,94,140,0.35);
     }
     .bottom-ticker {
       min-height: var(--ticker-height);
-      background: rgba(2,6,23,0.96);
-      border: 1px solid var(--panel-border);
+      background: linear-gradient(90deg, rgba(153,0,0,0.96), rgba(0,76,112,0.96));
+      border: 1px solid rgba(255,255,255,0.14);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow: hidden;
@@ -210,8 +224,8 @@
       right: 12px;
       z-index: 4;
       font-size: 12px;
-      color: #94a3b8;
-      background: rgba(2,6,23,0.7);
+      color: #f4d9d9;
+      background: rgba(47,41,43,0.82);
       padding: 6px 10px;
       border-radius: 999px;
     }
@@ -220,13 +234,13 @@
 <body>
   <div class="grid">
     <section class="pane">
-      <div class="pane-header">Pane 1 · Image rotation</div>
+      <div class="pane-header">Catholic University · Images</div>
       <div class="image-stage" id="imageStage"></div>
       <div class="status" id="imageStatus">Loading images...</div>
     </section>
 
     <section class="pane">
-      <div class="pane-header">Pane 2 · Scrolling infographic</div>
+      <div class="pane-header">Catholic University · Info</div>
       <div class="info-bg" id="infoBg"></div>
       <div class="info-overlay"></div>
       <div class="info-wrap">
@@ -235,15 +249,15 @@
     </section>
 
     <section class="pane">
-      <div class="pane-header">Pane 3 · RSS headlines</div>
+      <div class="pane-header">Catholic University · News</div>
       <div class="news-wrap">
-        <div class="news-feed-title" id="newsFeedTitle">Latest headlines</div>
+        <div class="news-feed-title" id="newsFeedTitle">Campus and World Headlines</div>
         <div class="news-track" id="newsTrack"></div>
       </div>
     </section>
 
     <section class="pane market-pane">
-      <div class="pane-header">Pane 4 · Market snapshot</div>
+      <div class="pane-header">Catholic University · Markets</div>
       <div class="market-note">
         Live market data from TradingView. Edit the TICKER_SYMBOLS list near the top of the file to change the stocks or funds shown.
       </div>
@@ -344,7 +358,7 @@
         const response = await fetch(url, { cache: 'no-store' });
         const data = await response.json();
         if (data.status !== 'ok' || !data.items) throw new Error('RSS feed did not return usable data.');
-        title.textContent = data.feed?.title || 'Latest headlines';
+        title.textContent = data.feed?.title || 'Campus and World Headlines';
         const items = data.items.slice(0, MAX_HEADLINES);
         const doubled = [...items, ...items];
         track.innerHTML = doubled.map(item => `
