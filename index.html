@@ -249,15 +249,15 @@
     </section>
 
     <section class="pane">
-      <div class="pane-header">Catholic University · News</div>
+      <div class="pane-header">World News</div>
       <div class="news-wrap">
-        <div class="news-feed-title" id="newsFeedTitle">Campus and World Headlines</div>
+        <div class="news-feed-title" id="newsFeedTitle">World News</div>
         <div class="news-track" id="newsTrack"></div>
       </div>
     </section>
 
     <section class="pane market-pane">
-      <div class="pane-header">Catholic University · Markets</div>
+      <div class="pane-header">World Markets</div>
       <div class="market-note">
         Live market data from TradingView. Edit the TICKER_SYMBOLS list near the top of the file to change the stocks or funds shown.
       </div>
@@ -358,7 +358,7 @@
         const response = await fetch(url, { cache: 'no-store' });
         const data = await response.json();
         if (data.status !== 'ok' || !data.items) throw new Error('RSS feed did not return usable data.');
-        title.textContent = data.feed?.title || 'Campus and World Headlines';
+        title.textContent = data.feed?.title || 'World News';
         const items = data.items.slice(0, MAX_HEADLINES);
         const doubled = [...items, ...items];
         track.innerHTML = doubled.map(item => `
